@@ -10,7 +10,7 @@ module PLSQL
     end
 
     def self.create(raw_conn, ar_class = nil) #:nodoc:
-      if ar_class && !(defined?(::ActiveRecord) && [ar_class, ar_class.superclass].include?(::ActiveRecord::Base))
+      if ar_class && !(defined?(::ActiveRecord) && ar_class.ancestors.include?(::ActiveRecord::Base))
         raise ArgumentError, "Wrong ActiveRecord class"
       end
       case driver_type
@@ -66,7 +66,7 @@ module PLSQL
     def jdbc?
       @raw_driver == :jdbc
     end
-    
+
     def logoff #:nodoc:
       # Rollback any uncommited transactions
       rollback
