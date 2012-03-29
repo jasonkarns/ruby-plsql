@@ -46,6 +46,16 @@ describe "Connection" do
 
   end
 
+  describe "create from ActiveRecord" do
+    it "should get connection from ActiveRecord" do
+
+    end
+
+    it "should get conection from ActiveRecord subclass" do
+
+    end
+  end
+
   # Ruby 1.8 and 1.9
   unless defined?(JRuby)
     describe "OCI data type conversions" do
@@ -113,7 +123,7 @@ describe "Connection" do
         clob = OCI8::CLOB.new(@raw_conn, large_text)
         @conn.ora_value_to_ruby_value(clob).should == large_text
       end
-      
+
     end
 
   # JRuby
@@ -128,19 +138,19 @@ describe "Connection" do
       it "should translate PL/SQL NUMBER to Ruby BigDecimal" do
         @conn.plsql_to_ruby_data_type(:data_type => "NUMBER", :data_length => 15).should == [BigDecimal, nil]
       end
-      
+
       it "should translate PL/SQL DATE to Ruby DateTime" do
         @conn.plsql_to_ruby_data_type(:data_type => "DATE", :data_length => nil).should == [DateTime, nil]
       end
-      
+
       it "should translate PL/SQL TIMESTAMP to Ruby Time" do
         @conn.plsql_to_ruby_data_type(:data_type => "TIMESTAMP", :data_length => nil).should == [Time, nil]
       end
-      
+
       it "should not translate Ruby Fixnum when BigDecimal type specified" do
         @conn.ruby_value_to_ora_value(100, BigDecimal).should == java.math.BigDecimal.new(100)
       end
-      
+
       it "should translate Ruby Bignum value to BigDecimal when BigDecimal type specified" do
         big_decimal = @conn.ruby_value_to_ora_value(12345678901234567890, BigDecimal)
         big_decimal.should == java.math.BigDecimal.new("12345678901234567890")
@@ -164,7 +174,7 @@ describe "Connection" do
       it "should translate Oracle BigDecimal integer value to Fixnum" do
         @conn.ora_value_to_ruby_value(BigDecimal("100")).should eql(100)
       end
-      
+
       it "should translate Oracle BigDecimal float value to BigDecimal" do
         @conn.ora_value_to_ruby_value(BigDecimal("100.11")).should eql(BigDecimal("100.11"))
       end
@@ -207,7 +217,7 @@ describe "Connection" do
       @conn.select_first("SELECT :1,:2,:3,:4,:5 FROM dual",
         'abc',123,123.456,@now,@today).should == ["abc",123,123.456,@now,Time.parse(@today.to_s)]
     end
-    
+
     it "should execute SQL statement with NULL values and return first result" do
       @now = Time.local(2008,05,31,23,22,11)
       @conn.select_first("SELECT NULL,123,123.456,
@@ -223,7 +233,7 @@ describe "Connection" do
         @conn.select_first("SELECT :1,:2,:3,:4,:5 FROM dual",
           nil,123,123.456,@now,@today).should == [nil,123,123.456,@now,Time.parse(@today.to_s)]
       end
-    
+
     end
 
     it "should execute SQL statement and return all results" do
@@ -251,7 +261,7 @@ describe "Connection" do
       @conn.select_all("SELECT :1,:2,:3,:4 FROM dual UNION ALL SELECT :1,:2,:3,:4 FROM dual",
         'abc',123,123.456,@now,'abc',123,123.456,@now).should == [["abc",123,123.456,@now],["abc",123,123.456,@now]]
     end
-    
+
     it "should execute SQL statement and yield all results in block" do
       @now = Time.local(2008,05,31,23,22,11)
       @conn.select_all("SELECT 'abc',123,123.456,
@@ -263,7 +273,7 @@ describe "Connection" do
         r.should == ["abc",123,123.456,@now]
       end.should == 2
     end
-    
+
     it "should execute SQL statement with bind parameters and yield all results in block" do
       @now = Time.local(2008,05,31,23,22,11)
       @conn.select_all("SELECT :1,:2,:3,:4 FROM dual UNION ALL SELECT :1,:2,:3,:4 FROM dual",
@@ -273,7 +283,7 @@ describe "Connection" do
     end
 
   end
-  
+
   describe "PL/SQL procedures" do
     before(:all) do
       @random = rand(1000)
@@ -310,9 +320,9 @@ describe "Connection" do
       cursor[":p_date"].should == @now
       cursor.close.should be_nil
     end
-  
+
   end
-  
+
   describe "commit and rollback" do
     before(:all) do
       @conn.exec("CREATE TABLE test_commit (dummy VARCHAR2(100))").should be_true
